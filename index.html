@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Interactive Baranyi Model Predictor</title>
+  <!-- Load Plotly library from CDN -->
+  <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 20px; }
+    .input-field { margin-bottom: 10px; }
+    label { display: inline-block; width: 280px; }
+    input { padding: 5px; }
+  </style>
+</head>
+<body>
+  <h1>Interactive Baranyi Model Predictor</h1>
+  <p>This tool uses the Baranyi model to simulate bacterial growth (in log(CFU/g)) over time (in days). Adjust the parameters below and click "Plot Growth Curve" to see the predicted curve.</p>
+  
+  <div class="input-field">
+    <label for="y0">Initial log(CFU/g) (y₀):</label>
+    <input type="number" id="y0" value="2" step="0.1">
+  </div>
+  <div class="input-field">
+    <label for="umax">Maximum specific growth rate (μₘₐₓ, per day):</label>
+    <input type="number" id="umax" value="0.5" step="0.1">
+  </div>
+  <div class="input-field">
+    <label for="ymax">Final (stationary) log(CFU/g) (yₘₐₓ):</label>
+    <input type="number" id="ymax" value="8" step="0.1">
+  </div>
+  <div class="input-field">
+    <label for="h0">Lag parameter (h₀):</label>
+    <input type="number" id="h0" value="1" step="0.1">
+  </div>
+  <div class="input-field">
+    <label for="days">Total simulation time (Days):</label>
+    <input type="number" id="days" value="10" step="0.1">
+  </div>
+  
+  <button onclick="plotModel()">Plot Growth Curve</button>
+  
+  <div id="plot" style="width: 100%; height: 500px; margin-top: 20px;"></div>
+  
+  <script>
+    // Baranyi model functions based on the formulation:
+    // y(t) = y₀ + μₘₐₓ * A(t) - ln( 1 + (exp(μₘₐₓ * A(t)) - 1) / exp(yₘₐₓ - y₀) )
+    // where A(t) = t + (1/μₘₐₓ) * ln( exp(-μₘₐₓ*t) + exp(-μₘₐₓ*h₀) - exp(-μₘₐₓ*(t+h₀)) )
+    
+    function A(t, umax, h0) {
+      // Compute the adjustment function A(t)
+      return t + (1 / umax) * Math.log( Math.exp(-umax * t) + Math.exp(-umax * h0) - Math.exp(-umax * (t + h0)) );
+    }
+    
+    function baranyi(t, y0, umax, ymax, h0) {
+      var At = A(t, umax, h0);
+      return y0 + umax * At - Math.log( 1 + (Math.exp(umax * At) - 1) / Math.exp(ymax - y0) );
+    }
+    
+    function plotModel() {
+      // Retrieve parameter values from input fields
+      var y0 = parseFloat(document.getElementById("y0").value);
+      var umax = parseFloat(document.getElementById("umax").value);
+      var ymax = parseFloat(document.getElementById("ymax").value);
+      var h0 = parseFloat(document.getElementById("h0").value);
+      var totalDays = parseFloat(document.getElementById("days").value);
+      
+      // Generate time points and corresponding predicted growth values
+      var x = [];
+      var y = [];
+      var numPoints = 100;
+      for (var i = 0; i <= numPoints; i++) {
+        var t = totalDays * i / numPoints;
+        x.push(t);
+        y.push(baranyi(t, y0, umax, ymax, h0));
+      }
+      
+      // Create a plotly trace for the predicted growth curve
+      var trace = {
+        x: x,
+        y: y,
+        mode: 'lines',
+        name: 'Predicted Growth'
+      };
+      
+      var layout = {
+        title: 'Baranyi Model: Predicted Bacterial Growth Curve',
+        xaxis: { title: 'Time (Days)' },
+        yaxis: { title: 'log(CFU/g)' }
+      };
+      
+      Plotly.newPlot('plot', [trace], layout);
+    }
+  </script>
+</body>
+</html>
