@@ -9,13 +9,37 @@
     body { font-family: Arial, sans-serif; margin: 20px; }
     .input-field { margin-bottom: 10px; }
     label { display: inline-block; width: 280px; }
-    input { padding: 5px; }
+    input, select { padding: 5px; }
   </style>
 </head>
 <body>
   <h1>Interactive Baranyi Model Predictor</h1>
-  <p>This tool uses the Baranyi model to simulate bacterial growth (in log(CFU/g)) over time (in days). Adjust the parameters below and click "Plot Growth Curve" to see the predicted curve.</p>
+  <p>
+    This tool simulates bacterial growth (in log(CFU/g)) over time (in days) using the Baranyi model. 
+    Select your product category and ingredient, adjust the model parameters if desired, and click 
+    "Plot Growth Curve" to see the predicted curve.
+  </p>
   
+  <!-- Dropdowns for product category and ingredient (treatment) -->
+  <div class="input-field">
+    <label for="category">Product Category:</label>
+    <select id="category" onchange="updateDefaults()">
+      <option value="meat">Meat</option>
+      <option value="dairy">Dairy</option>
+      <option value="produce">Produce</option>
+      <option value="bakery">Bakery</option>
+    </select>
+  </div>
+  <div class="input-field">
+    <label for="treatment">Ingredient (Treatment):</label>
+    <select id="treatment" onchange="updateDefaults()">
+      <option value="ingredientA">Ingredient A</option>
+      <option value="ingredientB">Ingredient B</option>
+      <option value="ingredientC">Ingredient C</option>
+    </select>
+  </div>
+  
+  <!-- Model parameter inputs -->
   <div class="input-field">
     <label for="y0">Initial log(CFU/g) (y₀):</label>
     <input type="number" id="y0" value="2" step="0.1">
@@ -42,18 +66,47 @@
   <div id="plot" style="width: 100%; height: 500px; margin-top: 20px;"></div>
   
   <script>
+    // Update default parameter values based on the selected product category and ingredient.
+    // These values are dummy defaults. Adjust the mappings based on your actual data.
+    function updateDefaults() {
+      var category = document.getElementById("category").value;
+      var treatment = document.getElementById("treatment").value;
+      
+      if(category === "meat" && treatment === "ingredientA") {
+        document.getElementById("y0").value = 2;
+        document.getElementById("umax").value = 0.5;
+        document.getElementById("ymax").value = 8;
+        document.getElementById("h0").value = 1;
+      } else if(category === "dairy" && treatment === "ingredientB") {
+        document.getElementById("y0").value = 1.5;
+        document.getElementById("umax").value = 0.6;
+        document.getElementById("ymax").value = 7.5;
+        document.getElementById("h0").value = 0.8;
+      } else if(category === "produce" && treatment === "ingredientC") {
+        document.getElementById("y0").value = 1;
+        document.getElementById("umax").value = 0.4;
+        document.getElementById("ymax").value = 7;
+        document.getElementById("h0").value = 1.2;
+      } else {
+        // Default parameters if no specific mapping exists
+        document.getElementById("y0").value = 2;
+        document.getElementById("umax").value = 0.5;
+        document.getElementById("ymax").value = 8;
+        document.getElementById("h0").value = 1;
+      }
+    }
+    
     // Baranyi model functions based on the formulation:
     // y(t) = y₀ + μₘₐₓ * A(t) - ln( 1 + (exp(μₘₐₓ * A(t)) - 1) / exp(yₘₐₓ - y₀) )
     // where A(t) = t + (1/μₘₐₓ) * ln( exp(-μₘₐₓ*t) + exp(-μₘₐₓ*h₀) - exp(-μₘₐₓ*(t+h₀)) )
     
     function A(t, umax, h0) {
-      // Compute the adjustment function A(t)
-      return t + (1 / umax) * Math.log( Math.exp(-umax * t) + Math.exp(-umax * h0) - Math.exp(-umax * (t + h0)) );
+      return t + (1 / umax) * Math.log(Math.exp(-umax * t) + Math.exp(-umax * h0) - Math.exp(-umax * (t + h0)));
     }
     
     function baranyi(t, y0, umax, ymax, h0) {
       var At = A(t, umax, h0);
-      return y0 + umax * At - Math.log( 1 + (Math.exp(umax * At) - 1) / Math.exp(ymax - y0) );
+      return y0 + umax * At - Math.log(1 + (Math.exp(umax * At) - 1) / Math.exp(ymax - y0));
     }
     
     function plotModel() {
@@ -74,7 +127,7 @@
         y.push(baranyi(t, y0, umax, ymax, h0));
       }
       
-      // Create a plotly trace for the predicted growth curve
+      // Create a Plotly trace for the predicted growth curve
       var trace = {
         x: x,
         y: y,
@@ -90,6 +143,9 @@
       
       Plotly.newPlot('plot', [trace], layout);
     }
+    
+    // Initialize defaults based on initial dropdown values
+    updateDefaults();
   </script>
 </body>
 </html>
