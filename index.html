@@ -8,38 +8,90 @@
   <style>
     body { font-family: Arial, sans-serif; margin: 20px; }
     .input-field { margin-bottom: 10px; }
-    label { display: inline-block; width: 280px; }
-    input, select { padding: 5px; }
+    label { display: inline-block; width: 250px; vertical-align: top; }
+    input, select { padding: 5px; width: 300px; }
+    .dropdown-container { margin-bottom: 20px; }
   </style>
 </head>
 <body>
   <h1>Interactive Baranyi Model Predictor</h1>
   <p>
-    This tool simulates bacterial growth (in log(CFU/g)) over time (in days) using the Baranyi model. 
-    Select your product category and ingredient, adjust the model parameters if desired, and click 
-    "Plot Growth Curve" to see the predicted curve.
+    This tool simulates bacterial growth (in log(CFU/g)) over time (in days) using the Baranyi model.
+    Select your product category, product, and ingredient (treatment), adjust model parameters if needed,
+    and click "Plot Growth Curve" to see the predicted curve.
   </p>
-  
-  <!-- Dropdowns for product category and ingredient (treatment) -->
-  <div class="input-field">
-    <label for="category">Product Category:</label>
-    <select id="category" onchange="updateDefaults()">
-      <option value="meat">Meat</option>
-      <option value="dairy">Dairy</option>
-      <option value="produce">Produce</option>
-      <option value="bakery">Bakery</option>
-    </select>
+
+  <!-- Dropdown for Product Category -->
+  <div class="dropdown-container">
+    <div class="input-field">
+      <label for="category">Product Category:</label>
+      <select id="category" onchange="updateDefaults()">
+        <option value="RTC Beef">RTC Beef</option>
+        <option value="RTE Beef">RTE Beef</option>
+        <option value="RTC Chicken">RTC Chicken</option>
+        <option value="RTC Pork">RTC Pork</option>
+        <option value="RTE Chicken">RTE Chicken</option>
+        <option value="RTC Turkey">RTC Turkey</option>
+        <option value="RTE Pork">RTE Pork</option>
+        <option value="RTE Turkey">RTE Turkey</option>
+        <option value="RTE Ham">RTE Ham</option>
+        <option value="RTE Hot dogs">RTE Hot dogs</option>
+        <option value="RTE Sausage">RTE Sausage</option>
+        <option value="Seafood">Seafood</option>
+        <option value="Sous Vide">Sous Vide</option>
+        <option value="Produce">Produce</option>
+        <option value="Prepared Food">Prepared Food</option>
+        <option value="Miscellaneous">Miscellaneous</option>
+        <option value="RTE HPP">RTE HPP</option>
+      </select>
+    </div>
+
+    <!-- Dropdown for Product -->
+    <div class="input-field">
+      <label for="product">Product:</label>
+      <select id="product" onchange="updateDefaults()">
+        <option value="Beef skirt steak">Beef skirt steak</option>
+        <option value="Roast Beef">Roast Beef</option>
+        <option value="Cured Beef/Corned Beef">Cured Beef/Corned Beef</option>
+        <option value="Uncured Beef/ Roast Beef">Uncured Beef/ Roast Beef</option>
+        <option value="Corned Beef">Corned Beef</option>
+        <option value="Beef Loin">Beef Loin</option>
+        <option value="Beef Carne Asada">Beef Carne Asada</option>
+        <option value="Beef Fajita">Beef Fajita</option>
+        <option value="Beef Rojo">Beef Rojo</option>
+        <option value="Meatball">Meatball</option>
+        <option value="Chili">Chili</option>
+        <option value="Lasagna w meat sauce">Lasagna w meat sauce</option>
+        <option value="Meatloaf">Meatloaf</option>
+        <option value="Beef Rib Roast">Beef Rib Roast</option>
+        <option value="Ground Beef">Ground Beef</option>
+        <option value="Beef Barbacoa">Beef Barbacoa</option>
+        <option value="Sous Vide Beef, Diced">Sous Vide Beef, Diced</option>
+        <option value="Bolognese and shells">Bolognese and shells</option>
+        <option value="Tumbled Steak">Tumbled Steak</option>
+        <!-- Continue adding all product options... -->
+        <option value="Honey Ham">Honey Ham</option>
+      </select>
+    </div>
+
+    <!-- Dropdown for Ingredient (Treatment) -->
+    <div class="input-field">
+      <label for="ingredient">Ingredient (Treatment):</label>
+      <select id="ingredient" onchange="updateDefaults()">
+        <option value="Potassium Lactate @ 3%">Potassium Lactate @ 3%</option>
+        <option value="ProTek @ 0.5%">ProTek @ 0.5%</option>
+        <option value="NatureIn VH @ 1.50%">NatureIn VH @ 1.50%</option>
+        <option value="NatureIn V @ 2%">NatureIn V @ 2%</option>
+        <option value="Opti.form Vinegar @ 2.25%">Opti.form Vinegar @ 2.25%</option>
+        <option value="Control with MYOSOL @ 0.45%">Control with MYOSOL @ 0.45%</option>
+        <option value="Ional plus @ 1%">Ional plus @ 1%</option>
+        <!-- Continue adding all ingredient options... -->
+        <option value="DV10 @ 0.55%">DV10 @ 0.55%</option>
+      </select>
+    </div>
   </div>
-  <div class="input-field">
-    <label for="treatment">Ingredient (Treatment):</label>
-    <select id="treatment" onchange="updateDefaults()">
-      <option value="ingredientA">Ingredient A</option>
-      <option value="ingredientB">Ingredient B</option>
-      <option value="ingredientC">Ingredient C</option>
-    </select>
-  </div>
-  
-  <!-- Model parameter inputs -->
+
+  <!-- Model Parameter Inputs -->
   <div class="input-field">
     <label for="y0">Initial log(CFU/g) (y₀):</label>
     <input type="number" id="y0" value="2" step="0.1">
@@ -60,35 +112,38 @@
     <label for="days">Total simulation time (Days):</label>
     <input type="number" id="days" value="10" step="0.1">
   </div>
-  
+
   <button onclick="plotModel()">Plot Growth Curve</button>
-  
+
   <div id="plot" style="width: 100%; height: 500px; margin-top: 20px;"></div>
-  
+
   <script>
-    // Update default parameter values based on the selected product category and ingredient.
-    // These values are dummy defaults. Adjust the mappings based on your actual data.
+    // Update default parameters based on selections.
+    // This demo uses a few example mappings; you can expand this as needed.
     function updateDefaults() {
       var category = document.getElementById("category").value;
-      var treatment = document.getElementById("treatment").value;
+      var product = document.getElementById("product").value;
+      var ingredient = document.getElementById("ingredient").value;
       
-      if(category === "meat" && treatment === "ingredientA") {
+      // Example: Set defaults for a few combinations.
+      // These values are placeholders.
+      if (category === "RTC Beef" && product === "Beef skirt steak" && ingredient === "Potassium Lactate @ 3%") {
         document.getElementById("y0").value = 2;
-        document.getElementById("umax").value = 0.5;
+        document.getElementById("umax").value = 0.6;
         document.getElementById("ymax").value = 8;
         document.getElementById("h0").value = 1;
-      } else if(category === "dairy" && treatment === "ingredientB") {
-        document.getElementById("y0").value = 1.5;
-        document.getElementById("umax").value = 0.6;
+      } else if (category === "RTE Chicken" && product === "Chicken Breast Fillets" && ingredient === "NatureIn VH @ 1.50%") {
+        document.getElementById("y0").value = 1.8;
+        document.getElementById("umax").value = 0.55;
         document.getElementById("ymax").value = 7.5;
-        document.getElementById("h0").value = 0.8;
-      } else if(category === "produce" && treatment === "ingredientC") {
-        document.getElementById("y0").value = 1;
-        document.getElementById("umax").value = 0.4;
-        document.getElementById("ymax").value = 7;
         document.getElementById("h0").value = 1.2;
+      } else if (category === "RTE Sausage" && product === "Italian Sausage" && ingredient === "Ional plus @ 1%") {
+        document.getElementById("y0").value = 2.2;
+        document.getElementById("umax").value = 0.65;
+        document.getElementById("ymax").value = 8.5;
+        document.getElementById("h0").value = 0.9;
       } else {
-        // Default parameters if no specific mapping exists
+        // Default parameters for unspecified combinations.
         document.getElementById("y0").value = 2;
         document.getElementById("umax").value = 0.5;
         document.getElementById("ymax").value = 8;
@@ -99,7 +154,6 @@
     // Baranyi model functions based on the formulation:
     // y(t) = y₀ + μₘₐₓ * A(t) - ln( 1 + (exp(μₘₐₓ * A(t)) - 1) / exp(yₘₐₓ - y₀) )
     // where A(t) = t + (1/μₘₐₓ) * ln( exp(-μₘₐₓ*t) + exp(-μₘₐₓ*h₀) - exp(-μₘₐₓ*(t+h₀)) )
-    
     function A(t, umax, h0) {
       return t + (1 / umax) * Math.log(Math.exp(-umax * t) + Math.exp(-umax * h0) - Math.exp(-umax * (t + h0)));
     }
@@ -110,14 +164,14 @@
     }
     
     function plotModel() {
-      // Retrieve parameter values from input fields
+      // Retrieve parameter values from input fields.
       var y0 = parseFloat(document.getElementById("y0").value);
       var umax = parseFloat(document.getElementById("umax").value);
       var ymax = parseFloat(document.getElementById("ymax").value);
       var h0 = parseFloat(document.getElementById("h0").value);
       var totalDays = parseFloat(document.getElementById("days").value);
       
-      // Generate time points and corresponding predicted growth values
+      // Generate time points and corresponding predicted growth values.
       var x = [];
       var y = [];
       var numPoints = 100;
@@ -127,7 +181,7 @@
         y.push(baranyi(t, y0, umax, ymax, h0));
       }
       
-      // Create a Plotly trace for the predicted growth curve
+      // Create a Plotly trace for the predicted growth curve.
       var trace = {
         x: x,
         y: y,
@@ -144,7 +198,7 @@
       Plotly.newPlot('plot', [trace], layout);
     }
     
-    // Initialize defaults based on initial dropdown values
+    // Initialize defaults based on initial dropdown values.
     updateDefaults();
   </script>
 </body>
